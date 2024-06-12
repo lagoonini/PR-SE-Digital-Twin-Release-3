@@ -1,0 +1,82 @@
+version: 2.1
+orbs:
+  node: circleci/node@5
+
+jobs:
+  test-node:
+    executor: node/default
+    working_directory: ~/project/Digitial-Twin-Frontend/
+    steps:
+      - checkout:
+          path: ~/project
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Add Google Chrome repository and install Chrome
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y wget gnupg
+            wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+            sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+            sudo apt-get update
+            sudo apt-get install -y google-chrome-stable
+      - run:
+          name: Set CHROME_BIN environment variable
+          command: echo 'export CHROME_BIN=/usr/bin/google-chrome' >> $BASH_ENV
+      - run:
+          name: Run tests with Jest
+          command: npm test
+
+  build-node:
+    # Build node project
+    executor: node/default
+    working_directory: ~/project/Digitial-Twin-Frontend/
+    steps:
+      - checkout:
+          path: ~/project
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          command: npm run build
+      - run:
+          name: Create the ~/artifacts directory if it doesn't exist
+          command: mkdir -p ~/artifacts
+      - run:
+          name: Copy artifacts
+          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
+      - store_artifacts:
+          path: ~/artifacts
+          destination: node-build
+
+  test-java:
+    docker:
+      - image: cimg/openjdk:17.0
+    working_directory: ~/project/demo
+    steps:
+      - checkout:
+          path: ~/project
+      - run:
+          name: Calculate cache key
+          command: |-
+            find . -name 'pom.xml' -o -name 'gradlew*' -o -name '*.gradle*' | \
+                    sort | xargs cat > /tmp/CIRCLECI_CACHE_KEY
+      - restore_cache:
+          key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
+      - run:
+          command: mvn verify
+      - store_test_results:
+          path: target/surefire-reports
+      - save_cache:
+          key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
+          paths:
+            - ~/.m2/repository
+
+workflows:
+  build-and-test:
+    jobs:
+      - test-node
+      - build-node:
+          requires:
+            - test-node
+            - test-java
+      - test-java
