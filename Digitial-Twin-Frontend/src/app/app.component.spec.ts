@@ -9,9 +9,9 @@ describe('AppComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ 
-       
-       RouterTestingModule    
+      imports: [
+
+       RouterTestingModule
       ],
       declarations: [AppComponent],
     });
@@ -19,7 +19,7 @@ describe('AppComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
-
+//
 
   it('should create the component', () => {
     expect(component).toBeTruthy();
