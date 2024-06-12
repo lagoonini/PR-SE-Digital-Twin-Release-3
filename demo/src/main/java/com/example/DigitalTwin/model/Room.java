@@ -1,9 +1,8 @@
 package com.example.DigitalTwin.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class Room {
@@ -20,6 +19,11 @@ public class Room {
 	private double co2; // Added
 	private int peopleCount; // Added
 
+	private String type; // Added
+
+	@OneToMany(mappedBy = "room")
+	private List<Device> devices; // Added
+
 	// Konstruktoren
 	public Room(String name, double size, int doors, int windows, int lights, int fans, double temperature, double co2, int peopleCount) {
 		this.name = name;
@@ -28,9 +32,9 @@ public class Room {
 		this.windows = windows;
 		this.lights = lights;
 		this.fans = fans;
-		this.temperature = temperature;
-		this.co2 = co2;
-		this.peopleCount = peopleCount;
+		this.temperature = temperature; // Added
+		this.co2 = co2; // Added
+		this.peopleCount = peopleCount; // Added
 	}
 
 	public Room() {
@@ -115,5 +119,21 @@ public class Room {
 
 	public void setPeopleCount(int peopleCount) {
 		this.peopleCount = peopleCount;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public List<Device> getDevices() {
+		return devices;
+	}
+
+	public void setDevices(List<Device> devices) {
+		this.devices = devices;
 	}
 }
