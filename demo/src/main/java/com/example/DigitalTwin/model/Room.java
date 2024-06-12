@@ -3,6 +3,7 @@ package com.example.DigitalTwin.model;
 import com.example.DigitalTwin.dto.RoomDto;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,7 @@ public class Room {
 	private String type; // Added
 
 	@OneToMany(mappedBy = "room")
-	private List<Device> devices; // Added
+	private List<Device> devices = new ArrayList<>(); // Added
 
 	// Konstruktoren
 	public Room(String name, double size, int doors, int windows, int lights, int fans, double temperature, double co2, int peopleCount) {
