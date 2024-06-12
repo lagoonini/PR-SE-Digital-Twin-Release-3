@@ -1,8 +1,11 @@
 package com.example.DigitalTwin.model;
 
+import com.example.DigitalTwin.dto.RoomDto;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 
 @Entity
 public class Room {
@@ -135,5 +138,16 @@ public class Room {
 
 	public void setDevices(List<Device> devices) {
 		this.devices = devices;
+	}
+
+	// Added
+	public RoomDto getDto() {
+		RoomDto dto = new RoomDto();
+		dto.setId(this.id);
+		dto.setName(this.name);
+		dto.setSize(this.size);
+		dto.setType(this.type);
+		dto.setDeviceDtoList(this.devices.stream().map(Device::getDto).collect(Collectors.toList()));
+		return dto;
 	}
 }
